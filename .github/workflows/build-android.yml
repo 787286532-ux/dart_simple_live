@@ -36,12 +36,14 @@ jobs:
           sed -i 's|gradle-8.12-|gradle-8.14-|g' gradle/wrapper/gradle-wrapper.properties
           cat gradle/wrapper/gradle-wrapper.properties
 
-      - name: Upgrade AGP to 8.11.1
+      - name: Upgrade AGP and Kotlin
         working-directory: simple_live_app/android
         run: |
-          find . -maxdepth 2 -name "settings.gradle*" -o -maxdepth 2 -name "build.gradle*" | while read f; do
+          FILES=$(find . -maxdepth 2 \( -name "settings.gradle*" -o -name "build.gradle*" \) -type f)
+          for f in $FILES; do
             echo "==== $f ===="
             sed -i 's/8\.9\.1/8.11.1/g' "$f"
+            sed -i 's/2\.1\.0/2.2.20/g' "$f"
             cat "$f"
           done
 
