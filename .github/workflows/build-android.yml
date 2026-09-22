@@ -24,6 +24,19 @@ jobs:
           flutter-version: '3.47.5'
           cache: true
 
+      - name: Set China mirror
+        run: |
+          echo "PUB_HOSTED_URL=https://pub.flutter-io.cn" >> $GITHUB_ENV
+          echo "FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn" >> $GITHUB_ENV
+
+      - name: Upgrade Gradle wrapper to 8.14.0
+        working-directory: simple_live_app/android
+        run: |
+          sed -i 's|gradle-8.12.0-|gradle-8.14.0-|g' gradle/wrapper/gradle-wrapper.properties
+          sed -i 's|gradle-8.12-|gradle-8.14-|g' gradle/wrapper/gradle-wrapper.properties
+          echo "---- gradle-wrapper.properties ----"
+          cat gradle/wrapper/gradle-wrapper.properties
+
       - name: Flutter clean
         working-directory: simple_live_app
         run: flutter clean
