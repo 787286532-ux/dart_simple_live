@@ -53,10 +53,41 @@ jobs:
           if [ -f build.gradle.kts ]; then
             cp build.gradle.kts build.gradle.kts.bak
             sed -i 's/ as String/ as? String ?: ""/g' build.gradle.kts
-            echo "==== BEFORE (35-55) ===="
-            sed -n '35,55p' build.gradle.kts.bak
             echo "==== AFTER (35-55) ===="
             sed -n '35,55p' build.gradle.kts
+          fi
+
+      - name: Force JVM 17 for all subprojects
+        working-directory: simple_live_app/android
+        run: |
+          if [ -f build.gradle.kts ]; then
+            cat >> build.gradle.kts <<'EOF'
+
+          subprojects {
+              afterEvaluate {
+                  tasks.withType<JavaCompile>().configureEach {
+                      sourceCompatibility = JavaVersion.VERSION_17.toString()
+                      targetCompatibility = JavaVersion.VERSION_17.toString()
+                  }
+              }
+          }
+          EOF
+            echo "==== build.gradle.kts (tail) ===="
+            tail -20 build.gradle.kts
+          elif [ -f build.gradle ]; then
+            cat >> build.gradle <<'EOF'
+
+          subprojects {
+              afterEvaluate { project ->
+                  project.tasks.withType(JavaCompile).configureEach {
+                      sourceCompatibility = JavaVersion.VERSION_17
+                      targetCompatibility = JavaVersion.VERSION_17
+                  }
+              }
+          }
+          EOF
+            echo "==== build.gradle (tail) ===="
+            tail -20 build.gradle
           fi
 
       - name: Create debug keystore and key.properties
@@ -72,7 +103,6 @@ jobs:
           keyAlias=androiddebugkey
           storeFile=$PWD/debug.keystore
           EOF
-          echo "==== key.properties ===="
           cat key.properties
 
       - name: Flutter pub get
