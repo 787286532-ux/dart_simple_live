@@ -34,8 +34,16 @@ jobs:
         run: |
           sed -i 's|gradle-8.12.0-|gradle-8.14.0-|g' gradle/wrapper/gradle-wrapper.properties
           sed -i 's|gradle-8.12-|gradle-8.14-|g' gradle/wrapper/gradle-wrapper.properties
-          echo "---- gradle-wrapper.properties ----"
           cat gradle/wrapper/gradle-wrapper.properties
+
+      - name: Upgrade AGP to 8.11.1
+        working-directory: simple_live_app/android
+        run: |
+          find . -maxdepth 2 -name "settings.gradle*" -o -maxdepth 2 -name "build.gradle*" | while read f; do
+            echo "==== $f ===="
+            sed -i 's/8\.9\.1/8.11.1/g' "$f"
+            cat "$f"
+          done
 
       - name: Flutter clean
         working-directory: simple_live_app
